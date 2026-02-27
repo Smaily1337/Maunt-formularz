@@ -16,7 +16,7 @@
                 extend: {
                     colors: {
                         mauntGold: '#DEB366', 
-                        mauntGoldDark: '#C29951', // Ciemniejszy odcień złota do efektu hover
+                        mauntGoldDark: '#C29951',
                         mauntDark: '#121212',
                         mauntGray: '#1E1E1E'
                     },
@@ -98,7 +98,6 @@
             outline: none;
             border-color: #DEB366; 
             background: #181818;
-            /* Dodany złoty cień o grubości 1px od środka wzmacnia wizualnie złotą ramkę na każdym input'cie */
             box-shadow: 0 0 0 1px #DEB366, 0 10px 25px -5px rgba(0, 0, 0, 0.5);
             transform: translateY(-2px);
         }
@@ -145,13 +144,13 @@
         .maunt-checkbox:checked::before { transform: scale(1); }
     </style>
 </head>
-<body class="min-h-screen w-full flex items-center justify-center relative font-sans bg-mauntDark py-6 md:py-12">
+<body class="min-h-screen w-full flex flex-col items-center justify-center relative font-sans bg-mauntDark py-6 md:py-12">
 
     <div class="noise-overlay"></div>
 
     <div class="slanted-bg"></div>
 
-    <main id="form-view" class="w-full max-w-5xl relative z-10 px-4 md:px-8 fade-view fade-in-active animate-entry">
+    <main id="form-view" class="w-full max-w-5xl mx-auto relative z-10 px-4 md:px-8 fade-view fade-in-active animate-entry">
         
         <div class="bg-mauntDark p-6 sm:p-10 md:p-16 shadow-2xl border-t-4 border-mauntGold relative">
             
@@ -320,4 +319,4 @@
 </body>
 </html>
 
-/* made by: bartlomiej.rozycki@icloud.com */
+// made by: bartlomiej.rozycki@icloud.com
