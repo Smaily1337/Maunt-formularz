@@ -16,6 +16,7 @@
                 extend: {
                     colors: {
                         mauntGold: '#DEB366', 
+                        mauntGoldDark: '#C29951', // Ciemniejszy odcień złota do efektu hover
                         mauntDark: '#121212',
                         mauntGray: '#1E1E1E'
                     },
@@ -81,7 +82,7 @@
         .fade-out-down { opacity: 0; transform: translateY(30px) scale(0.98); visibility: hidden; }
         .fade-in-active { opacity: 1; transform: translateY(0) scale(1); visibility: visible; }
 
-        /* --- STYLE PÓL FORMULARZA (Responsywne) --- */
+        /* --- STYLE PÓL FORMULARZA (Responsywne + Poprawiony Focus) --- */
         .maunt-input {
             background: #1E1E1E;
             border: 2px solid #333;
@@ -97,7 +98,8 @@
             outline: none;
             border-color: #DEB366; 
             background: #181818;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+            /* Dodany złoty cień o grubości 1px od środka wzmacnia wizualnie złotą ramkę na każdym input'cie */
+            box-shadow: 0 0 0 1px #DEB366, 0 10px 25px -5px rgba(0, 0, 0, 0.5);
             transform: translateY(-2px);
         }
 
@@ -166,7 +168,7 @@
 
             <form id="lead-form" class="space-y-6 md:space-y-8" novalidate>
                 <div class="animate-entry delay-200 relative">
-                    <label for="name" class="block text-white text-xs md:text-sm font-bold tracking-widest mb-2 md:mb-3 uppercase">Vor- und Nachname / Name</label>
+                    <label for="name" class="block text-white text-xs md:text-sm font-bold tracking-widest mb-2 md:mb-3 uppercase">Vorname und Nachname / Name</label>
                     <div class="relative">
                         <input type="text" id="name" name="name" required autocomplete="off"
                                class="maunt-input w-full p-4 md:p-6 text-lg md:text-2xl font-bold rounded-none">
@@ -192,17 +194,17 @@
                     </div>
                 </div>
 
-                <div class="pt-4 md:pt-6 flex items-start md:items-center gap-4 md:gap-6 animate-entry delay-500">
+                <div class="pt-4 md:pt-6 flex items-start md:items-center gap-4 md:gap-8 animate-entry delay-500">
                     <input type="checkbox" id="gdpr" name="gdpr" required class="maunt-checkbox shrink-0 hover:scale-105 active:scale-95 mt-1 md:mt-0">
-                    <label for="gdpr" class="text-gray-300 text-sm md:text-lg font-medium cursor-pointer select-none">
+                    <label for="gdpr" class="text-gray-300 text-sm md:text-lg md:leading-relaxed font-medium cursor-pointer select-none">
                         Ich bin mit der Verarbeitung meiner Daten für kommerzielle Kontaktzwecke einverstanden. <br>
-                        <span class="text-gray-500 text-xs md:text-base mt-1 block">I agree to the processing of data for commercial contact purposes.</span>
+                        <span class="text-gray-500 text-xs md:text-base mt-1 md:mt-2 block">I agree to the processing of data for commercial contact purposes.</span>
                     </label>
                 </div>
 
                 <div class="pt-6 md:pt-10 animate-entry delay-600">
                     <button type="submit" id="submit-btn" 
-                            class="w-full bg-mauntGold text-mauntDark hover:bg-white hover:text-mauntDark transition-all duration-300 p-5 md:p-8 text-xl md:text-3xl font-black uppercase tracking-widest flex justify-center items-center gap-4 hover:-translate-y-2 hover:shadow-[0_15px_30px_rgba(222,179,102,0.3)] active:translate-y-0">
+                            class="w-full bg-mauntGold text-mauntDark hover:bg-mauntGoldDark hover:text-mauntDark transition-all duration-300 p-5 md:p-8 text-xl md:text-3xl font-black uppercase tracking-[3px] flex justify-center items-center gap-4 hover:-translate-y-2 hover:shadow-[0_15px_30px_rgba(222,179,102,0.3)] active:translate-y-0">
                         <span>SENDEN / SUBMIT</span>
                     </button>
                 </div>
@@ -250,7 +252,6 @@
                 e.preventDefault();
 
                 if (!form.checkValidity()) {
-                    // Przetłumaczony Alert
                     alert('Bitte füllen Sie alle Felder korrekt aus, bevor Sie das Formular absenden. / Please fill in all fields correctly before submitting.');
                     return;
                 }
@@ -264,7 +265,7 @@
                     SENDEN...
                 `;
                 submitBtn.classList.add('opacity-80', 'cursor-wait');
-                submitBtn.classList.remove('hover:bg-white', 'hover:-translate-y-2');
+                submitBtn.classList.remove('hover:bg-mauntGoldDark', 'hover:-translate-y-2');
 
                 const formData = new FormData(form);
                 
@@ -272,7 +273,6 @@
                     await new Promise(resolve => setTimeout(resolve, 800)); 
                     triggerSuccessFlow();
                 } catch (error) {
-                    // Przetłumaczony Alert błędu
                     alert('Beim Senden der Daten ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut. / An error occurred while sending the data. Please try again.');
                     resetFormState();
                 }
@@ -312,10 +312,12 @@
                 submitBtn.disabled = false;
                 submitBtn.innerHTML = originalBtnContent;
                 submitBtn.classList.remove('opacity-80', 'cursor-wait');
-                submitBtn.classList.add('hover:bg-white', 'hover:-translate-y-2');
+                submitBtn.classList.add('hover:bg-mauntGoldDark', 'hover:-translate-y-2');
                 textInputs.forEach(input => input.classList.remove('is-valid'));
             }
         });
     </script>
 </body>
 </html>
+
+/* made by: bartlomiej.rozycki@icloud.com */
