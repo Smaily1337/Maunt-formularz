@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pl">
+<html lang="de">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -34,8 +34,10 @@
         /* --- USTAWIENIA BAZOWE KIOSK --- */
         body {
             background-color: #121212;
-            overflow: hidden;
-            touch-action: pan-x pan-y;
+            overflow-x: hidden;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            touch-action: pan-y;
             perspective: 1000px;
         }
 
@@ -79,14 +81,18 @@
         .fade-out-down { opacity: 0; transform: translateY(30px) scale(0.98); visibility: hidden; }
         .fade-in-active { opacity: 1; transform: translateY(0) scale(1); visibility: visible; }
 
-        /* --- STYLE PÓL FORMULARZA --- */
+        /* --- STYLE PÓL FORMULARZA (Responsywne) --- */
         .maunt-input {
             background: #1E1E1E;
             border: 2px solid #333;
             color: white;
             transition: all 0.3s ease;
-            padding-right: 4rem; 
+            padding-right: 3rem; 
         }
+        @media (min-width: 768px) {
+            .maunt-input { padding-right: 4rem; } 
+        }
+        
         .maunt-input:focus {
             outline: none;
             border-color: #DEB366; 
@@ -106,12 +112,13 @@
             transform: translateY(-50%) scale(1);
         }
 
+        /* --- CHECKBOX (Responsywny) --- */
         .maunt-checkbox {
             appearance: none;
             background-color: #1E1E1E;
             margin: 0;
-            width: 3.5rem;
-            height: 3.5rem;
+            width: 2.5rem; 
+            height: 2.5rem; 
             border: 2px solid #333;
             display: grid;
             place-content: center;
@@ -120,97 +127,102 @@
         }
         .maunt-checkbox::before {
             content: "";
-            width: 2rem;
-            height: 2rem;
+            width: 1.5rem; 
+            height: 1.5rem; 
             transform: scale(0);
             transition: 200ms transform cubic-bezier(0.16, 1, 0.3, 1);
             background-color: #121212;
             clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
         }
+        @media (min-width: 768px) {
+            .maunt-checkbox { width: 3.5rem; height: 3.5rem; } 
+            .maunt-checkbox::before { width: 2rem; height: 2rem; } 
+        }
+        
         .maunt-checkbox:checked { background-color: #DEB366; border-color: #DEB366; } 
         .maunt-checkbox:checked::before { transform: scale(1); }
     </style>
 </head>
-<body class="h-screen w-screen flex items-center justify-center relative font-sans bg-mauntDark">
+<body class="min-h-screen w-full flex items-center justify-center relative font-sans bg-mauntDark py-6 md:py-12">
 
     <div class="noise-overlay"></div>
 
     <div class="slanted-bg"></div>
 
-    <main id="form-view" class="w-full max-w-5xl relative z-10 px-8 fade-view fade-in-active animate-entry">
+    <main id="form-view" class="w-full max-w-5xl relative z-10 px-4 md:px-8 fade-view fade-in-active animate-entry">
         
-        <div class="bg-mauntDark p-16 shadow-2xl border-t-4 border-mauntGold relative">
+        <div class="bg-mauntDark p-6 sm:p-10 md:p-16 shadow-2xl border-t-4 border-mauntGold relative">
             
-            <div class="mb-10 animate-entry flex justify-center select-none">
-                <img src="https://bluedragonjet.com/wp-content/uploads/2026/02/Maunt_logo_GOLD_RGB-2.pdf" alt="MAUNT. Logo" class="h-16 object-contain">
+            <div class="mb-6 md:mb-10 animate-entry flex justify-center select-none">
+                <img src="https://bluedragonjet.com/wp-content/uploads/2026/02/Maunt_logo_GOLD_RGB-2.pdf" alt="MAUNT. Logo" class="h-10 md:h-16 object-contain">
             </div>
 
-            <div class="mb-14 animate-entry delay-100">
-                <h1 class="text-6xl text-mauntGold font-black uppercase leading-tight mb-2">
-                    Industrial <br>Roadshow 2026
+            <div class="mb-8 md:mb-14 animate-entry delay-100 text-center md:text-left">
+                <h1 class="text-3xl sm:text-4xl md:text-6xl text-mauntGold font-black uppercase leading-tight mb-2">
+                    Industrial <br class="hidden md:block">Roadshow 2026
                 </h1>
-                <p class="text-gray-400 text-xl font-bold tracking-widest uppercase mt-4">Zostaw swoje dane / Leave your details</p>
+                <p class="text-gray-400 text-xs sm:text-sm md:text-xl font-bold tracking-widest uppercase mt-2 md:mt-4">Hinterlassen Sie Ihre Daten / Leave your details</p>
             </div>
 
-            <form id="lead-form" class="space-y-8" novalidate>
+            <form id="lead-form" class="space-y-6 md:space-y-8" novalidate>
                 <div class="animate-entry delay-200 relative">
-                    <label for="name" class="block text-white text-sm font-bold tracking-widest mb-3 uppercase">Imię i Nazwisko / Name</label>
+                    <label for="name" class="block text-white text-xs md:text-sm font-bold tracking-widest mb-2 md:mb-3 uppercase">Vor- und Nachname / Name</label>
                     <div class="relative">
                         <input type="text" id="name" name="name" required autocomplete="off"
-                               class="maunt-input w-full p-6 text-2xl font-bold rounded-none">
-                        <svg class="validation-icon absolute right-6 top-1/2 w-8 h-8 text-mauntGold pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+                               class="maunt-input w-full p-4 md:p-6 text-lg md:text-2xl font-bold rounded-none">
+                        <svg class="validation-icon absolute right-4 md:right-6 top-1/2 w-6 h-6 md:w-8 md:h-8 text-mauntGold pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
                     </div>
                 </div>
 
                 <div class="animate-entry delay-300 relative">
-                    <label for="company" class="block text-white text-sm font-bold tracking-widest mb-3 uppercase">Firma / Company</label>
+                    <label for="company" class="block text-white text-xs md:text-sm font-bold tracking-widest mb-2 md:mb-3 uppercase">Firma / Company</label>
                     <div class="relative">
                         <input type="text" id="company" name="company" required autocomplete="off"
-                               class="maunt-input w-full p-6 text-2xl font-bold rounded-none">
-                        <svg class="validation-icon absolute right-6 top-1/2 w-8 h-8 text-mauntGold pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+                               class="maunt-input w-full p-4 md:p-6 text-lg md:text-2xl font-bold rounded-none">
+                        <svg class="validation-icon absolute right-4 md:right-6 top-1/2 w-6 h-6 md:w-8 md:h-8 text-mauntGold pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
                     </div>
                 </div>
 
                 <div class="animate-entry delay-400 relative">
-                    <label for="email" class="block text-white text-sm font-bold tracking-widest mb-3 uppercase">Adres E-mail / Email</label>
+                    <label for="email" class="block text-white text-xs md:text-sm font-bold tracking-widest mb-2 md:mb-3 uppercase">E-Mail Adresse / Email</label>
                     <div class="relative">
                         <input type="email" id="email" name="email" required autocomplete="off"
-                               class="maunt-input w-full p-6 text-2xl font-bold rounded-none">
-                        <svg class="validation-icon absolute right-6 top-1/2 w-8 h-8 text-mauntGold pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+                               class="maunt-input w-full p-4 md:p-6 text-lg md:text-2xl font-bold rounded-none">
+                        <svg class="validation-icon absolute right-4 md:right-6 top-1/2 w-6 h-6 md:w-8 md:h-8 text-mauntGold pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
                     </div>
                 </div>
 
-                <div class="pt-6 flex items-center gap-6 animate-entry delay-500">
-                    <input type="checkbox" id="gdpr" name="gdpr" required class="maunt-checkbox shrink-0 hover:scale-105 active:scale-95">
-                    <label for="gdpr" class="text-gray-300 text-lg font-medium cursor-pointer select-none">
-                        Wyrażam zgodę na przetwarzanie danych w celach kontaktu handlowego. <br>
-                        <span class="text-gray-500 text-base mt-1 block">I agree to the processing of data for commercial contact purposes.</span>
+                <div class="pt-4 md:pt-6 flex items-start md:items-center gap-4 md:gap-6 animate-entry delay-500">
+                    <input type="checkbox" id="gdpr" name="gdpr" required class="maunt-checkbox shrink-0 hover:scale-105 active:scale-95 mt-1 md:mt-0">
+                    <label for="gdpr" class="text-gray-300 text-sm md:text-lg font-medium cursor-pointer select-none">
+                        Ich bin mit der Verarbeitung meiner Daten für kommerzielle Kontaktzwecke einverstanden. <br>
+                        <span class="text-gray-500 text-xs md:text-base mt-1 block">I agree to the processing of data for commercial contact purposes.</span>
                     </label>
                 </div>
 
-                <div class="pt-10 animate-entry delay-600">
+                <div class="pt-6 md:pt-10 animate-entry delay-600">
                     <button type="submit" id="submit-btn" 
-                            class="w-full bg-mauntGold text-mauntDark hover:bg-white hover:text-mauntDark transition-all duration-300 p-8 text-3xl font-black uppercase tracking-widest flex justify-center items-center gap-4 hover:-translate-y-2 hover:shadow-[0_15px_30px_rgba(222,179,102,0.3)] active:translate-y-0">
-                        <span>WYŚLIJ / SUBMIT</span>
+                            class="w-full bg-mauntGold text-mauntDark hover:bg-white hover:text-mauntDark transition-all duration-300 p-5 md:p-8 text-xl md:text-3xl font-black uppercase tracking-widest flex justify-center items-center gap-4 hover:-translate-y-2 hover:shadow-[0_15px_30px_rgba(222,179,102,0.3)] active:translate-y-0">
+                        <span>SENDEN / SUBMIT</span>
                     </button>
                 </div>
             </form>
         </div>
     </main>
 
-    <section id="success-view" class="absolute inset-0 flex flex-col items-center justify-center fade-view fade-out-down z-20 bg-mauntDark pointer-events-none">
+    <section id="success-view" class="fixed inset-0 flex flex-col items-center justify-center fade-view fade-out-down z-20 bg-mauntDark pointer-events-none px-4">
         
-        <div class="mb-16 animate-entry z-30 relative flex justify-center select-none">
-            <img src="https://bluedragonjet.com/wp-content/uploads/2026/02/Maunt_logo_GOLD_RGB-2.pdf" alt="MAUNT. Logo" class="h-20 object-contain">
+        <div class="mb-10 md:mb-16 animate-entry z-30 relative flex justify-center select-none">
+            <img src="https://bluedragonjet.com/wp-content/uploads/2026/02/Maunt_logo_GOLD_RGB-2.pdf" alt="MAUNT. Logo" class="h-12 md:h-20 object-contain">
         </div>
 
-        <div class="w-56 h-56 rounded-full border-8 border-mauntGold flex items-center justify-center mb-12 shadow-glow animate-entry delay-100 bg-mauntDark z-30">
-            <svg class="w-28 h-28 text-mauntGold" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <div class="w-40 h-40 md:w-56 md:h-56 rounded-full border-4 md:border-8 border-mauntGold flex items-center justify-center mb-8 md:mb-12 shadow-glow animate-entry delay-100 bg-mauntDark z-30">
+            <svg class="w-20 h-20 md:w-28 md:h-28 text-mauntGold" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                 <path class="checkmark-path" stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M5 13l4 4L19 7"></path>
             </svg>
         </div>
-        <h2 class="text-7xl font-black text-white mb-6 uppercase tracking-tight animate-entry delay-300 z-30 relative">Vielen Dank!</h2>
-        <h3 class="text-4xl font-bold text-mauntGold uppercase tracking-widest animate-entry delay-500 z-30 relative">Dziękujemy</h3>
+        <h2 class="text-4xl sm:text-5xl md:text-7xl font-black text-white mb-4 md:mb-6 uppercase tracking-tight animate-entry delay-300 z-30 relative text-center">Vielen Dank!</h2>
+        <h3 class="text-xl md:text-4xl font-bold text-mauntGold uppercase tracking-widest animate-entry delay-500 z-30 relative text-center">Thank you</h3>
     </section>
 
     <script>
@@ -224,7 +236,6 @@
             const originalBtnContent = submitBtn.innerHTML;
             const ENDPOINT_URL = 'https://formspree.io/f/twoj-testowy-endpoint'; 
 
-            // --- MIKRO-WALIDACJA W CZASIE RZECZYWISTYM ---
             textInputs.forEach(input => {
                 input.addEventListener('input', () => {
                     if (input.checkValidity() && input.value.trim().length > 0) {
@@ -235,22 +246,22 @@
                 });
             });
 
-            // --- OBSŁUGA WYSYŁKI FORMULARZA ---
             form.addEventListener('submit', async (e) => {
                 e.preventDefault();
 
                 if (!form.checkValidity()) {
-                    alert('Proszę poprawnie wypełnić wszystkie pola przed wysłaniem.');
+                    // Przetłumaczony Alert
+                    alert('Bitte füllen Sie alle Felder korrekt aus, bevor Sie das Formular absenden. / Please fill in all fields correctly before submitting.');
                     return;
                 }
 
                 submitBtn.disabled = true;
                 submitBtn.innerHTML = `
-                    <svg class="animate-spin -ml-1 mr-3 h-8 w-8 text-mauntDark" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <svg class="animate-spin -ml-1 mr-3 h-6 w-6 md:h-8 md:w-8 text-mauntDark" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                         <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                     </svg>
-                    WYSYŁANIE...
+                    SENDEN...
                 `;
                 submitBtn.classList.add('opacity-80', 'cursor-wait');
                 submitBtn.classList.remove('hover:bg-white', 'hover:-translate-y-2');
@@ -261,7 +272,8 @@
                     await new Promise(resolve => setTimeout(resolve, 800)); 
                     triggerSuccessFlow();
                 } catch (error) {
-                    alert('Wystąpił błąd przy wysyłaniu danych. Spróbuj ponownie.');
+                    // Przetłumaczony Alert błędu
+                    alert('Beim Senden der Daten ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut. / An error occurred while sending the data. Please try again.');
                     resetFormState();
                 }
             });
@@ -273,6 +285,9 @@
                 setTimeout(() => {
                     successView.classList.remove('fade-out-down', 'pointer-events-none');
                     successView.classList.add('fade-in-active');
+                    
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+
                     setTimeout(() => successView.classList.add('animate-success'), 50);
                     setTimeout(resetAppFlow, 5000);
                 }, 600);
@@ -298,7 +313,6 @@
                 submitBtn.innerHTML = originalBtnContent;
                 submitBtn.classList.remove('opacity-80', 'cursor-wait');
                 submitBtn.classList.add('hover:bg-white', 'hover:-translate-y-2');
-                
                 textInputs.forEach(input => input.classList.remove('is-valid'));
             }
         });
