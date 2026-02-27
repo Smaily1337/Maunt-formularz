@@ -43,32 +43,13 @@
         .noise-overlay {
             position: fixed;
             inset: 0;
-            z-index: 50; /* Na samej górze */
-            pointer-events: none; /* Nie blokuje kliknięć! */
-            opacity: 0.04; /* Ultra subtelne */
+            z-index: 50;
+            pointer-events: none;
+            opacity: 0.04;
             background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
         }
 
-        /* --- TŁA I PARALLAX --- */
-        .monogram-bg {
-             position: fixed;
-             top: -10%;
-             left: -5%;
-             width: 110%;
-             height: 120%;
-             display: flex;
-             justify-content: center;
-             align-items: start;
-             pointer-events: none;
-             z-index: 0;
-        }
-        
-        /* Płynne poruszanie SVG w tle (Parallax) */
-        .monogram-bg svg {
-            will-change: transform;
-            transition: transform 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-        }
-
+        /* --- TŁA --- */
         .slanted-bg {
             position: fixed;
             bottom: 0;
@@ -104,7 +85,7 @@
             border: 2px solid #333;
             color: white;
             transition: all 0.3s ease;
-            padding-right: 4rem; /* Miejsce na ikonę walidacji */
+            padding-right: 4rem; 
         }
         .maunt-input:focus {
             outline: none;
@@ -118,7 +99,7 @@
         .validation-icon {
             opacity: 0;
             transform: translateY(-50%) scale(0.5);
-            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); /* Efekt "wyskoku" (bounce) */
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
         .maunt-input.is-valid + .validation-icon {
             opacity: 1;
@@ -154,21 +135,14 @@
 
     <div class="noise-overlay"></div>
 
-    <div class="monogram-bg">
-        <svg id="parallax-target" class="h-full w-auto text-mauntGray opacity-[0.07]" viewBox="0 0 400 400" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-            <path d="M40 40 V360 H120 V160 L200 280 L280 160 V360 H360 V40 H260 L200 130 L140 40 H40Z"/>
-        </svg>
-    </div>
-
     <div class="slanted-bg"></div>
 
     <main id="form-view" class="w-full max-w-5xl relative z-10 px-8 fade-view fade-in-active animate-entry">
         
         <div class="bg-mauntDark p-16 shadow-2xl border-t-4 border-mauntGold relative">
             
-            <div class="mb-10 animate-entry flex items-end justify-center text-mauntGold select-none">
-                <span class="text-5xl font-black tracking-[-0.05em] leading-none" style="transform: scaleX(1.08); transform-origin: center;">MAUNT.</span>
-                <span class="text-base font-bold ml-1 mb-0.5">&reg;</span>
+            <div class="mb-10 animate-entry flex justify-center select-none">
+                <img src="https://bluedragonjet.com/wp-content/uploads/2026/02/Maunt_logo_GOLD_RGB-2.pdf" alt="MAUNT. Logo" class="h-16 object-contain">
             </div>
 
             <div class="mb-14 animate-entry delay-100">
@@ -225,9 +199,9 @@
     </main>
 
     <section id="success-view" class="absolute inset-0 flex flex-col items-center justify-center fade-view fade-out-down z-20 bg-mauntDark pointer-events-none">
-        <div class="mb-16 animate-entry z-30 relative flex items-end justify-center text-mauntGold select-none">
-            <span class="text-6xl font-black tracking-[-0.05em] leading-none" style="transform: scaleX(1.08); transform-origin: center;">MAUNT.</span>
-            <span class="text-lg font-bold ml-2 mb-1">&reg;</span>
+        
+        <div class="mb-16 animate-entry z-30 relative flex justify-center select-none">
+            <img src="https://bluedragonjet.com/wp-content/uploads/2026/02/Maunt_logo_GOLD_RGB-2.pdf" alt="MAUNT. Logo" class="h-20 object-contain">
         </div>
 
         <div class="w-56 h-56 rounded-full border-8 border-mauntGold flex items-center justify-center mb-12 shadow-glow animate-entry delay-100 bg-mauntDark z-30">
@@ -246,40 +220,13 @@
             const successView = document.getElementById('success-view');
             const submitBtn = document.getElementById('submit-btn');
             const textInputs = document.querySelectorAll('.maunt-input');
-            const parallaxTarget = document.getElementById('parallax-target');
             
             const originalBtnContent = submitBtn.innerHTML;
             const ENDPOINT_URL = 'https://formspree.io/f/twoj-testowy-endpoint'; 
 
-            // --- FUNKCJA PARALLAX (Myszka + Żyroskop) ---
-            function applyParallax(x, y) {
-                // Limitujemy maksymalny ruch do 30px w każdą stronę
-                const moveX = Math.max(-30, Math.min(30, x));
-                const moveY = Math.max(-30, Math.min(30, y));
-                parallaxTarget.style.transform = `translate(${moveX}px, ${moveY}px)`;
-            }
-
-            // Obsługa myszki (dla testów na PC)
-            window.addEventListener('mousemove', (e) => {
-                const x = (e.clientX / window.innerWidth - 0.5) * 60; // mnożnik siły
-                const y = (e.clientY / window.innerHeight - 0.5) * 60;
-                applyParallax(x, y);
-            });
-
-            // Obsługa żyroskopu (dla iPada / tabletu)
-            window.addEventListener('deviceorientation', (e) => {
-                if(!e.gamma || !e.beta) return;
-                // gamma: ruch lewo/prawo (-90 do 90), beta: przód/tył (-180 do 180)
-                const x = (e.gamma / 90) * 50; 
-                const y = (e.beta / 90) * 50;
-                applyParallax(x, y);
-            });
-
-
             // --- MIKRO-WALIDACJA W CZASIE RZECZYWISTYM ---
             textInputs.forEach(input => {
                 input.addEventListener('input', () => {
-                    // Sprawdź czy pole spełnia wymogi HTML (np. format email) i nie jest tylko spacjami
                     if (input.checkValidity() && input.value.trim().length > 0) {
                         input.classList.add('is-valid');
                     } else {
@@ -288,12 +235,10 @@
                 });
             });
 
-
             // --- OBSŁUGA WYSYŁKI FORMULARZA ---
             form.addEventListener('submit', async (e) => {
                 e.preventDefault();
 
-                // Dodatkowa walidacja (ponieważ używamy novalidate żeby uniknąć natywnych brzydkich dymków)
                 if (!form.checkValidity()) {
                     alert('Proszę poprawnie wypełnić wszystkie pola przed wysłaniem.');
                     return;
@@ -313,7 +258,7 @@
                 const formData = new FormData(form);
                 
                 try {
-                    await new Promise(resolve => setTimeout(resolve, 800)); // Symulacja dla efektu
+                    await new Promise(resolve => setTimeout(resolve, 800)); 
                     triggerSuccessFlow();
                 } catch (error) {
                     alert('Wystąpił błąd przy wysyłaniu danych. Spróbuj ponownie.');
@@ -354,7 +299,6 @@
                 submitBtn.classList.remove('opacity-80', 'cursor-wait');
                 submitBtn.classList.add('hover:bg-white', 'hover:-translate-y-2');
                 
-                // Reset ikon walidacji
                 textInputs.forEach(input => input.classList.remove('is-valid'));
             }
         });
