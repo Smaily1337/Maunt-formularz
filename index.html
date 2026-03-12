@@ -82,7 +82,7 @@
         .fade-out-down { opacity: 0; transform: translateY(30px) scale(0.98); visibility: hidden; }
         .fade-in-active { opacity: 1; transform: translateY(0) scale(1); visibility: visible; }
 
-        /* --- STYLE PÓL FORMULARZA (Responsywne + Poprawiony Focus) --- */
+        /* --- STYLE PÓL FORMULARZA --- */
         .maunt-input {
             background: #1E1E1E;
             border: 2px solid #333;
@@ -113,7 +113,7 @@
             transform: translateY(-50%) scale(1);
         }
 
-        /* --- CHECKBOX (Responsywny) --- */
+        /* --- CHECKBOX --- */
         .maunt-checkbox {
             appearance: none;
             background-color: #1E1E1E;
@@ -154,8 +154,10 @@
         
         <div class="bg-mauntDark p-6 sm:p-10 md:p-16 shadow-2xl border-t-4 border-mauntGold relative">
             
-            <div class="mb-6 md:mb-10 animate-entry flex justify-center select-none">
-                <img src="https://bluedragonjet.com/wp-content/uploads/2026/02/Maunt_logo_GOLD_RGB-2.pdf" alt="MAUNT. Logo" class="h-10 md:h-16 object-contain">
+            <div class="mb-6 md:mb-10 animate-entry flex flex-col md:flex-row items-center justify-center select-none gap-3 md:gap-6">
+                <img src="https://bluedragonjet.com/wp-content/uploads/2026/02/Maunt_logo_GOLD_RGB-2.pdf" alt="MAUNT. Logo" class="h-10 md:h-16 object-contain shrink-0">
+                <span class="text-mauntGold text-2xl md:text-3xl font-black self-center shrink-0">X</span>
+                <img src="https://bluedragonjet.com/wp-content/uploads/2026/01/cropped-logo-male.png" alt="BDJ Logo" class="h-24 md:h-36 object-contain shrink-0">
             </div>
 
             <div class="mb-8 md:mb-14 animate-entry delay-100 text-center md:text-left">
@@ -213,8 +215,10 @@
 
     <section id="success-view" class="fixed inset-0 flex flex-col items-center justify-center fade-view fade-out-down z-20 bg-mauntDark pointer-events-none px-4">
         
-        <div class="mb-10 md:mb-16 animate-entry z-30 relative flex justify-center select-none">
-            <img src="https://bluedragonjet.com/wp-content/uploads/2026/02/Maunt_logo_GOLD_RGB-2.pdf" alt="MAUNT. Logo" class="h-12 md:h-20 object-contain">
+        <div class="mb-10 md:mb-16 animate-entry z-30 relative flex flex-col md:flex-row items-center justify-center select-none gap-4 md:gap-8">
+            <img src="https://bluedragonjet.com/wp-content/uploads/2026/02/Maunt_logo_GOLD_RGB-2.pdf" alt="MAUNT. Logo" class="h-12 md:h-20 object-contain shrink-0">
+            <span class="text-mauntGold text-3xl md:text-4xl font-black self-center shrink-0">X</span>
+            <img src="https://bluedragonjet.com/wp-content/uploads/2026/01/cropped-logo-male.png" alt="BDJ Logo" class="h-32 md:h-48 object-contain shrink-0">
         </div>
 
         <div class="w-40 h-40 md:w-56 md:h-56 rounded-full border-4 md:border-8 border-mauntGold flex items-center justify-center mb-8 md:mb-12 shadow-glow animate-entry delay-100 bg-mauntDark z-30">
@@ -318,5 +322,3 @@
     </script>
 </body>
 </html>
-
-// made by: bartlomiej.rozycki@icloud.com
