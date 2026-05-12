@@ -1,361 +1,149 @@
 <!DOCTYPE html>
-<html lang="pl">
+<html lang="de">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>MAUNT. Lead Capture</title>
-    
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <title>BDJ Kiosk</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&display=swap" rel="stylesheet">
-    
     <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        mauntGold: '#DEB366', 
-                        mauntDark: '#121212',
-                        mauntGray: '#1E1E1E'
-                    },
-                    fontFamily: {
-                        sans: ['Montserrat', 'sans-serif'],
-                    },
-                    boxShadow: {
-                        'glow': '0 0 30px rgba(222, 179, 102, 0.2)',
-                    }
-                }
-            }
-        }
-    </script>
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/intl-tel-input@23.0.10/build/css/intlTelInput.css">
+    <script src="https://cdn.jsdelivr.net/npm/intl-tel-input@23.0.10/build/js/intlTelInput.min.js"></script>
 
     <style>
-        /* --- USTAWIENIA BAZOWE KIOSK --- */
-        body {
-            background-color: #121212;
-            overflow: hidden;
-            touch-action: pan-x pan-y;
-            perspective: 1000px;
-        }
-
-        /* --- 1. TEKSTURA SZUMU (NOISE) --- */
-        .noise-overlay {
-            position: fixed;
-            inset: 0;
-            z-index: 50; /* Na samej górze */
-            pointer-events: none; /* Nie blokuje kliknięć! */
-            opacity: 0.04; /* Ultra subtelne */
-            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
-        }
-
-        /* --- TŁA I PARALLAX --- */
-        .monogram-bg {
-             position: fixed;
-             top: -10%;
-             left: -5%;
-             width: 110%;
-             height: 120%;
-             display: flex;
-             justify-content: center;
-             align-items: start;
-             pointer-events: none;
-             z-index: 0;
-        }
-        
-        /* Płynne poruszanie SVG w tle (Parallax) */
-        .monogram-bg svg {
-            will-change: transform;
-            transition: transform 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-        }
-
+        body { background-color: #2497d0; font-family: 'Montserrat', sans-serif; overflow-x: hidden; }
         .slanted-bg {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 45vh;
-            background-color: #ffffff;
-            clip-path: polygon(0 15%, 100% 0, 100% 100%, 0% 100%);
-            z-index: 1;
+            position: fixed; bottom: 0; left: 0; width: 100%; height: 40vh;
+            background-color: #ffffff; clip-path: polygon(0 15%, 100% 0, 100% 100%, 0% 100%); z-index: 1;
         }
-
-        /* --- ANIMACJE --- */
-        @keyframes fadeInUp { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
-        .animate-entry { opacity: 0; animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-        .delay-100 { animation-delay: 100ms; }
-        .delay-200 { animation-delay: 200ms; }
-        .delay-300 { animation-delay: 300ms; }
-        .delay-400 { animation-delay: 400ms; }
-        .delay-500 { animation-delay: 500ms; }
-        .delay-600 { animation-delay: 600ms; }
-
-        .checkmark-path { stroke-dasharray: 60; stroke-dashoffset: 60; }
-        .animate-success .checkmark-path { animation: drawCheck 0.8s 0.3s ease-out forwards; }
-        @keyframes drawCheck { to { stroke-dashoffset: 0; } }
-
-        .fade-view { transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.6s; }
-        .fade-out-down { opacity: 0; transform: translateY(30px) scale(0.98); visibility: hidden; }
-        .fade-in-active { opacity: 1; transform: translateY(0) scale(1); visibility: visible; }
-
-        /* --- STYLE PÓL FORMULARZA --- */
+        .maunt-input, .iti { width: 100%; }
         .maunt-input {
-            background: #1E1E1E;
-            border: 2px solid #333;
-            color: white;
-            transition: all 0.3s ease;
-            padding-right: 4rem; /* Miejsce na ikonę walidacji */
+            background: #1E1E1E; border: 2px solid #333; color: white; transition: all 0.3s;
         }
-        .maunt-input:focus {
-            outline: none;
-            border-color: #DEB366; 
-            background: #181818;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
-            transform: translateY(-2px);
-        }
-
-        /* --- 2. MIKRO-WALIDACJA --- */
-        .validation-icon {
-            opacity: 0;
-            transform: translateY(-50%) scale(0.5);
-            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); /* Efekt "wyskoku" (bounce) */
-        }
-        .maunt-input.is-valid + .validation-icon {
-            opacity: 1;
-            transform: translateY(-50%) scale(1);
-        }
-
-        .maunt-checkbox {
-            appearance: none;
-            background-color: #1E1E1E;
-            margin: 0;
-            width: 3.5rem;
-            height: 3.5rem;
-            border: 2px solid #333;
-            display: grid;
-            place-content: center;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-        .maunt-checkbox::before {
-            content: "";
-            width: 2rem;
-            height: 2rem;
-            transform: scale(0);
-            transition: 200ms transform cubic-bezier(0.16, 1, 0.3, 1);
-            background-color: #121212;
-            clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
-        }
-        .maunt-checkbox:checked { background-color: #DEB366; border-color: #DEB366; } 
-        .maunt-checkbox:checked::before { transform: scale(1); }
+        .maunt-input:focus { outline: none; border-color: #ffffff; background: #2a2a2a; transform: translateY(-2px); }
+        
+        /* Poprawka koloru dla listy krajów */
+        .iti__country-list { color: #000; }
+        .fade-view { transition: opacity 0.5s ease, transform 0.5s ease; }
+        .hidden-view { opacity: 0; transform: translateY(30px); pointer-events: none; display: none; }
     </style>
 </head>
-<body class="h-screen w-screen flex items-center justify-center relative font-sans bg-mauntDark">
-
-    <div class="noise-overlay"></div>
-
-    <div class="monogram-bg">
-        <svg id="parallax-target" class="h-full w-auto text-mauntGray opacity-[0.07]" viewBox="0 0 400 400" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-            <path d="M40 40 V360 H120 V160 L200 280 L280 160 V360 H360 V40 H260 L200 130 L140 40 H40Z"/>
-        </svg>
-    </div>
+<body class="min-h-screen flex flex-col items-center justify-center p-4">
 
     <div class="slanted-bg"></div>
 
-    <main id="form-view" class="w-full max-w-5xl relative z-10 px-8 fade-view fade-in-active animate-entry">
-        
-        <div class="bg-mauntDark p-16 shadow-2xl border-t-4 border-mauntGold relative">
+    <main id="form-view" class="w-full max-w-4xl relative z-10 fade-view">
+        <div class="bg-[#2497d0] p-8 md:p-12 shadow-2xl border-t-8 border-white">
             
-            <div class="mb-10 animate-entry flex items-end justify-center text-mauntGold select-none">
-                <span class="text-5xl font-black tracking-[-0.05em] leading-none" style="transform: scaleX(1.08); transform-origin: center;">MAUNT.</span>
-                <span class="text-base font-bold ml-1 mb-0.5">&reg;</span>
+            <div class="flex flex-col items-center justify-center mb-8 text-center">
+                <img src="https://bluedragonjet.com/wp-content/uploads/2026/03/bdj-logo-white.pdf" alt="BDJ" class="h-48 md:h-80 object-contain">
             </div>
 
-            <div class="mb-14 animate-entry delay-100">
-                <h1 class="text-6xl text-mauntGold font-black uppercase leading-tight mb-2">
-                    Industrial <br>Roadshow 2026
-                </h1>
-                <p class="text-gray-400 text-xl font-bold tracking-widest uppercase mt-4">Zostaw swoje dane / Leave your details</p>
-            </div>
+            <h2 class="text-white text-center text-xl md:text-2xl font-black uppercase tracking-widest mb-10">
+                Hinterlassen Sie Ihre Daten / Leave your details
+            </h2>
 
-            <form id="lead-form" class="space-y-8" novalidate>
-                <div class="animate-entry delay-200 relative">
-                    <label for="name" class="block text-white text-sm font-bold tracking-widest mb-3 uppercase">Imię i Nazwisko / Name</label>
-                    <div class="relative">
-                        <input type="text" id="name" name="name" required autocomplete="off"
-                               class="maunt-input w-full p-6 text-2xl font-bold rounded-none">
-                        <svg class="validation-icon absolute right-6 top-1/2 w-8 h-8 text-mauntGold pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+            <form id="lead-form" class="space-y-6">
+                <input type="hidden" name="access_key" value="f2fd5407-163e-4d73-ad00-380225767137">
+                
+                <div>
+                    <label class="block text-white text-xs font-bold uppercase mb-2">Name</label>
+                    <input type="text" name="name" required class="maunt-input w-full p-4 md:p-6 text-xl font-bold">
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-white text-xs font-bold uppercase mb-2">Firma / Company</label>
+                        <input type="text" name="company" required class="maunt-input w-full p-4 md:p-6 text-xl font-bold">
+                    </div>
+                    <div>
+                        <label class="block text-white text-xs font-bold uppercase mb-2">USt-IDNr. / VAT ID (NIP)</label>
+                        <input type="text" name="vatid" class="maunt-input w-full p-4 md:p-6 text-xl font-bold">
                     </div>
                 </div>
 
-                <div class="animate-entry delay-300 relative">
-                    <label for="company" class="block text-white text-sm font-bold tracking-widest mb-3 uppercase">Firma / Company</label>
-                    <div class="relative">
-                        <input type="text" id="company" name="company" required autocomplete="off"
-                               class="maunt-input w-full p-6 text-2xl font-bold rounded-none">
-                        <svg class="validation-icon absolute right-6 top-1/2 w-8 h-8 text-mauntGold pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-white text-xs font-bold uppercase mb-2">Email</label>
+                        <input type="email" name="email" required class="maunt-input w-full p-4 md:p-6 text-xl font-bold">
+                    </div>
+                    <div>
+                        <label class="block text-white text-xs font-bold uppercase mb-2">Telefon / Phone</label>
+                        <input type="tel" id="phone" name="phone_full" required class="maunt-input w-full p-4 md:p-6 text-xl font-bold">
                     </div>
                 </div>
 
-                <div class="animate-entry delay-400 relative">
-                    <label for="email" class="block text-white text-sm font-bold tracking-widest mb-3 uppercase">Adres E-mail / Email</label>
-                    <div class="relative">
-                        <input type="email" id="email" name="email" required autocomplete="off"
-                               class="maunt-input w-full p-6 text-2xl font-bold rounded-none">
-                        <svg class="validation-icon absolute right-6 top-1/2 w-8 h-8 text-mauntGold pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
-                    </div>
-                </div>
-
-                <div class="pt-6 flex items-center gap-6 animate-entry delay-500">
-                    <input type="checkbox" id="gdpr" name="gdpr" required class="maunt-checkbox shrink-0 hover:scale-105 active:scale-95">
-                    <label for="gdpr" class="text-gray-300 text-lg font-medium cursor-pointer select-none">
-                        Wyrażam zgodę na przetwarzanie danych w celach kontaktu handlowego. <br>
-                        <span class="text-gray-500 text-base mt-1 block">I agree to the processing of data for commercial contact purposes.</span>
+                <div class="flex items-start gap-4 py-4">
+                    <input type="checkbox" name="gdpr" required class="w-8 h-8 shrink-0 cursor-pointer">
+                    <label class="text-white text-sm cursor-pointer select-none">
+                        Ich bin einverstanden / I agree to the processing of data.
                     </label>
                 </div>
 
-                <div class="pt-10 animate-entry delay-600">
-                    <button type="submit" id="submit-btn" 
-                            class="w-full bg-mauntGold text-mauntDark hover:bg-white hover:text-mauntDark transition-all duration-300 p-8 text-3xl font-black uppercase tracking-widest flex justify-center items-center gap-4 hover:-translate-y-2 hover:shadow-[0_15px_30px_rgba(222,179,102,0.3)] active:translate-y-0">
-                        <span>WYŚLIJ / SUBMIT</span>
-                    </button>
-                </div>
+                <button type="submit" id="btn" class="w-full bg-white text-[#2497d0] p-6 md:p-8 text-2xl font-black uppercase hover:bg-gray-100 transition-all active:scale-95">
+                    SENDEN / SUBMIT
+                </button>
             </form>
         </div>
     </main>
 
-    <section id="success-view" class="absolute inset-0 flex flex-col items-center justify-center fade-view fade-out-down z-20 bg-mauntDark pointer-events-none">
-        <div class="mb-16 animate-entry z-30 relative flex items-end justify-center text-mauntGold select-none">
-            <span class="text-6xl font-black tracking-[-0.05em] leading-none" style="transform: scaleX(1.08); transform-origin: center;">MAUNT.</span>
-            <span class="text-lg font-bold ml-2 mb-1">&reg;</span>
+    <section id="success-view" class="hidden-view fixed inset-0 flex flex-col items-center justify-center bg-[#2497d0] z-50 text-center px-4">
+        <div class="w-32 h-32 border-8 border-white rounded-full flex items-center justify-center mb-8">
+            <span class="text-white text-6xl">✓</span>
         </div>
-
-        <div class="w-56 h-56 rounded-full border-8 border-mauntGold flex items-center justify-center mb-12 shadow-glow animate-entry delay-100 bg-mauntDark z-30">
-            <svg class="w-28 h-28 text-mauntGold" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path class="checkmark-path" stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M5 13l4 4L19 7"></path>
-            </svg>
-        </div>
-        <h2 class="text-7xl font-black text-white mb-6 uppercase tracking-tight animate-entry delay-300 z-30 relative">Vielen Dank!</h2>
-        <h3 class="text-4xl font-bold text-mauntGold uppercase tracking-widest animate-entry delay-500 z-30 relative">Dziękujemy</h3>
+        <h2 class="text-white text-5xl font-black uppercase mb-4">Vielen Dank!</h2>
+        <h3 class="text-white text-2xl font-bold uppercase opacity-80">Thank you</h3>
     </section>
 
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const form = document.getElementById('lead-form');
-            const formView = document.getElementById('form-view');
-            const successView = document.getElementById('success-view');
-            const submitBtn = document.getElementById('submit-btn');
-            const textInputs = document.querySelectorAll('.maunt-input');
-            const parallaxTarget = document.getElementById('parallax-target');
+        // Inicjalizacja wyboru kraju
+        const phoneInput = document.querySelector("#phone");
+        const iti = window.intlTelInput(phoneInput, {
+            initialCountry: "pl",
+            separateDialCode: true,
+            preferredCountries: ["pl", "de", "gb", "us"],
+            utilsScript: "https://cdn.jsdelivr.net/npm/intl-tel-input@23.0.10/build/js/utils.js",
+        });
+
+        const form = document.getElementById('lead-form');
+        const btn = document.getElementById('btn');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            btn.disabled = true;
+            btn.innerText = "SENDING...";
+
+            const formData = new FormData(form);
+            const object = Object.fromEntries(formData);
             
-            const originalBtnContent = submitBtn.innerHTML;
-            const ENDPOINT_URL = 'https://formspree.io/f/twoj-testowy-endpoint'; 
+            // Pobieramy pełny numer z kodem kraju
+            object.phone = iti.getNumber();
 
-            // --- FUNKCJA PARALLAX (Myszka + Żyroskop) ---
-            function applyParallax(x, y) {
-                // Limitujemy maksymalny ruch do 30px w każdą stronę
-                const moveX = Math.max(-30, Math.min(30, x));
-                const moveY = Math.max(-30, Math.min(30, y));
-                parallaxTarget.style.transform = `translate(${moveX}px, ${moveY}px)`;
-            }
-
-            // Obsługa myszki (dla testów na PC)
-            window.addEventListener('mousemove', (e) => {
-                const x = (e.clientX / window.innerWidth - 0.5) * 60; // mnożnik siły
-                const y = (e.clientY / window.innerHeight - 0.5) * 60;
-                applyParallax(x, y);
-            });
-
-            // Obsługa żyroskopu (dla iPada / tabletu)
-            window.addEventListener('deviceorientation', (e) => {
-                if(!e.gamma || !e.beta) return;
-                // gamma: ruch lewo/prawo (-90 do 90), beta: przód/tył (-180 do 180)
-                const x = (e.gamma / 90) * 50; 
-                const y = (e.beta / 90) * 50;
-                applyParallax(x, y);
-            });
-
-
-            // --- MIKRO-WALIDACJA W CZASIE RZECZYWISTYM ---
-            textInputs.forEach(input => {
-                input.addEventListener('input', () => {
-                    // Sprawdź czy pole spełnia wymogi HTML (np. format email) i nie jest tylko spacjami
-                    if (input.checkValidity() && input.value.trim().length > 0) {
-                        input.classList.add('is-valid');
-                    } else {
-                        input.classList.remove('is-valid');
-                    }
+            try {
+                const response = await fetch('https://api.web3forms.com/submit', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                    body: JSON.stringify(object)
                 });
-            });
 
-
-            // --- OBSŁUGA WYSYŁKI FORMULARZA ---
-            form.addEventListener('submit', async (e) => {
-                e.preventDefault();
-
-                // Dodatkowa walidacja (ponieważ używamy novalidate żeby uniknąć natywnych brzydkich dymków)
-                if (!form.checkValidity()) {
-                    alert('Proszę poprawnie wypełnić wszystkie pola przed wysłaniem.');
-                    return;
+                if (response.ok) {
+                    document.getElementById('form-view').classList.add('hidden-view');
+                    document.getElementById('success-view').style.display = 'flex';
+                    setTimeout(() => {
+                        document.getElementById('success-view').classList.remove('hidden-view');
+                        document.getElementById('success-view').style.opacity = '1';
+                    }, 10);
+                    
+                    setTimeout(() => location.reload(), 5000);
+                } else {
+                    alert("Error! Please try again.");
+                    btn.disabled = false;
+                    btn.innerText = "SENDEN / SUBMIT";
                 }
-
-                submitBtn.disabled = true;
-                submitBtn.innerHTML = `
-                    <svg class="animate-spin -ml-1 mr-3 h-8 w-8 text-mauntDark" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    WYSYŁANIE...
-                `;
-                submitBtn.classList.add('opacity-80', 'cursor-wait');
-                submitBtn.classList.remove('hover:bg-white', 'hover:-translate-y-2');
-
-                const formData = new FormData(form);
-                
-                try {
-                    await new Promise(resolve => setTimeout(resolve, 800)); // Symulacja dla efektu
-                    triggerSuccessFlow();
-                } catch (error) {
-                    alert('Wystąpił błąd przy wysyłaniu danych. Spróbuj ponownie.');
-                    resetFormState();
-                }
-            });
-
-            function triggerSuccessFlow() {
-                formView.classList.remove('fade-in-active');
-                formView.classList.add('fade-out-down');
-
-                setTimeout(() => {
-                    successView.classList.remove('fade-out-down', 'pointer-events-none');
-                    successView.classList.add('fade-in-active');
-                    setTimeout(() => successView.classList.add('animate-success'), 50);
-                    setTimeout(resetAppFlow, 5000);
-                }, 600);
-            }
-
-            function resetAppFlow() {
-                successView.classList.remove('fade-in-active', 'animate-success');
-                successView.classList.add('fade-out-down', 'pointer-events-none');
-
-                setTimeout(() => {
-                    form.reset();
-                    resetFormState();
-                    formView.classList.remove('animate-entry');
-                    void formView.offsetWidth; 
-                    formView.classList.add('animate-entry');
-                    formView.classList.remove('fade-out-down');
-                    formView.classList.add('fade-in-active');
-                }, 600);
-            }
-
-            function resetFormState() {
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = originalBtnContent;
-                submitBtn.classList.remove('opacity-80', 'cursor-wait');
-                submitBtn.classList.add('hover:bg-white', 'hover:-translate-y-2');
-                
-                // Reset ikon walidacji
-                textInputs.forEach(input => input.classList.remove('is-valid'));
+            } catch (err) {
+                alert("Connection error.");
+                btn.disabled = false;
+                btn.innerText = "SENDEN / SUBMIT";
             }
         });
     </script>
