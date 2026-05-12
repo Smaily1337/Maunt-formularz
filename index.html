@@ -23,9 +23,18 @@
         }
         .maunt-input:focus { outline: none; border-color: #ffffff; background: #2a2a2a; transform: translateY(-2px); }
         
-        /* Styl listy podpowiedzi (systemowy) */
+        select.maunt-input {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='white' viewBox='0 0 24 24'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+            background-size: 1.5em;
+        }
+
         .fade-view { transition: opacity 0.5s ease, transform 0.5s ease; }
         .hidden-view { opacity: 0; transform: translateY(30px); pointer-events: none; display: none; }
+        
+        select option { background-color: #1E1E1E; color: white; }
     </style>
 </head>
 <body class="min-h-screen flex flex-col items-center justify-center p-4">
@@ -75,69 +84,46 @@
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                        <label class="block text-white text-xs font-bold uppercase mb-2">Land / Country (Search...)</label>
+                        <label class="block text-white text-xs font-bold uppercase mb-2">Land / Country</label>
                         <input list="countries" name="country" required class="maunt-input p-4 md:p-6 text-xl font-bold" placeholder="Start typing...">
                         <datalist id="countries">
                             <option value="Germany">
                             <option value="Poland">
                             <option value="United Kingdom">
                             <option value="USA">
-                            <option value="Afghanistan">
-                            <option value="Albania">
-                            <option value="Algeria">
-                            <option value="Andorra">
-                            <option value="Angola">
-                            <option value="Argentina">
-                            <option value="Armenia">
-                            <option value="Australia">
-                            <option value="Austria">
-                            <option value="Azerbaijan">
-                            <option value="Belgium">
-                            <option value="Brazil">
-                            <option value="Bulgaria">
-                            <option value="Canada">
-                            <option value="Chile">
-                            <option value="China">
-                            <option value="Croatia">
-                            <option value="Czech Republic">
-                            <option value="Denmark">
-                            <option value="Egypt">
-                            <option value="Estonia">
-                            <option value="Finland">
                             <option value="France">
-                            <option value="Georgia">
-                            <option value="Greece">
-                            <option value="Hungary">
-                            <option value="Iceland">
-                            <option value="India">
-                            <option value="Indonesia">
-                            <option value="Ireland">
-                            <option value="Israel">
                             <option value="Italy">
-                            <option value="Japan">
-                            <option value="Korea, South">
-                            <option value="Latvia">
-                            <option value="Lithuania">
-                            <option value="Luxembourg">
-                            <option value="Mexico">
-                            <option value="Netherlands">
-                            <option value="Norway">
-                            <option value="Portugal">
-                            <option value="Romania">
-                            <option value="Slovakia">
-                            <option value="Slovenia">
                             <option value="Spain">
-                            <option value="Sweden">
+                            <option value="Netherlands">
                             <option value="Switzerland">
-                            <option value="Turkey">
-                            <option value="Ukraine">
-                            <option value="United Arab Emirates">
-                            <option value="Vietnam">
+                            <option value="Austria">
+                            <option value="Czech Republic">
+                            <option value="Slovakia">
                         </datalist>
                     </div>
+                    
                     <div>
-                        <label class="block text-white text-xs font-bold uppercase mb-2">Anfrage für Maschine / Inquiry for machine</label>
-                        <input type="text" name="machine_inquiry" class="maunt-input p-4 md:p-6 text-xl font-bold">
+                        <label class="block text-white text-xs font-bold uppercase mb-2">Maschine / Machine</label>
+                        <select name="machine_inquiry" required class="maunt-input p-4 md:p-6 text-xl font-bold">
+                            <option value="" disabled selected>Select Machine</option>
+                            <option value="BDJ NEXT">BDJ NEXT</option>
+                            <option value="BDJ Budget Plus Easy Set">BDJ Budget Plus Easy Set</option>
+                            <option value="BDJ Budget Easy Set">BDJ Budget Easy Set</option>
+                            <option value="BDJ Budget PLUS">BDJ Budget PLUS</option>
+                            <option value="BDJ Budget">BDJ Budget</option>
+                            <option value="BDJ Mini">BDJ Mini</option>
+                            <option value="BDJ Mini Counter">BDJ Mini Counter</option>
+                            <option value="BDJ Hydro">BDJ Hydro</option>
+                            <option value="BDJ Hydro Chain Cable">BDJ Hydro Chain Cable</option>
+                            <option value="BDJ Hydro Chain Multi Tube">BDJ Hydro Chain Multi Tube</option>
+                            <option value="BDJ Max Dual Head">BDJ Max Dual Head</option>
+                            <option value="BDJ Max">BDJ Max</option>
+                            <option value="BDJ Extended">BDJ Extended</option>
+                            <option value="DragonAir">DragonAir</option>
+                            <option value="Electronic Counter">Electronic Counter</option>
+                            <option value="M-Head">M-Head</option>
+                            <option value="POW-Head">POW-Head</option>
+                        </select>
                     </div>
                 </div>
 
@@ -200,7 +186,7 @@
                     }, 10);
                     setTimeout(() => location.reload(), 5000);
                 } else {
-                    alert("Error! Please verify your key via email.");
+                    alert("Error! Please verify your key.");
                     btn.disabled = false;
                     btn.innerText = "SENDEN / SUBMIT";
                 }
