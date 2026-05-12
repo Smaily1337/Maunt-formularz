@@ -3,311 +3,147 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>BDJ </title>
-    
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <title>BDJ Kiosk</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&display=swap" rel="stylesheet">
-    
     <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        mauntGold: '#ffffff', 
-                        mauntGoldDark: '#1e425D',
-                        mauntDark: '#2497d0',
-                        mauntGray: '#1E425D'
-                    },
-                    fontFamily: {
-                        sans: ['Montserrat', 'sans-serif'],
-                    },
-                    boxShadow: {
-                        'glow': '0 0 30px rgba(222, 179, 102, 0.2)',
-                    }
-                }
-            }
-        }
-    </script>
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/intl-tel-input@23.0.10/build/css/intlTelInput.css">
+    <script src="https://cdn.jsdelivr.net/npm/intl-tel-input@23.0.10/build/js/intlTelInput.min.js"></script>
 
     <style>
-        /* --- USTAWIENIA BAZOWE KIOSK --- */
-        body {
-            background-color: lch(47.05% 49.88 277.27);
-            overflow-x: hidden;
-            overflow-y: auto;
-            -webkit-overflow-scrolling: touch;
-            touch-action: pan-y;
-            perspective: 1000px;
-        }
-
-        .noise-overlay {
-            position: fixed;
-            inset: 0;
-            z-index: 50;
-            pointer-events: none;
-            opacity: 0.04;
-            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
-        }
-
+        body { background-color: #2497d0; font-family: 'Montserrat', sans-serif; overflow-x: hidden; }
         .slanted-bg {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 45vh;
-            background-color: #ffffff;
-            clip-path: polygon(0 15%, 100% 0, 100% 100%, 0% 100%);
-            z-index: 1;
+            position: fixed; bottom: 0; left: 0; width: 100%; height: 40vh;
+            background-color: #ffffff; clip-path: polygon(0 15%, 100% 0, 100% 100%, 0% 100%); z-index: 1;
         }
-
-        @keyframes fadeInUp { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
-        .animate-entry { opacity: 0; animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-        .delay-100 { animation-delay: 100ms; }
-        .delay-200 { animation-delay: 200ms; }
-        .delay-300 { animation-delay: 300ms; }
-        .delay-400 { animation-delay: 400ms; }
-        .delay-500 { animation-delay: 500ms; }
-        .delay-600 { animation-delay: 600ms; }
-
-        .checkmark-path { stroke-dasharray: 60; stroke-dashoffset: 60; }
-        .animate-success .checkmark-path { animation: drawCheck 0.8s 0.3s ease-out forwards; }
-        @keyframes drawCheck { to { stroke-dashoffset: 0; } }
-
-        .fade-view { transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.6s; }
-        .fade-out-down { opacity: 0; transform: translateY(30px) scale(0.98); visibility: hidden; }
-        .fade-in-active { opacity: 1; transform: translateY(0) scale(1); visibility: visible; }
-
+        .maunt-input, .iti { width: 100%; }
         .maunt-input {
-            background: #1E1E1E;
-            border: 2px solid #333;
-            color: white;
-            transition: all 0.3s ease;
-            padding-right: 3rem; 
+            background: #1E1E1E; border: 2px solid #333; color: white; transition: all 0.3s;
         }
-        @media (min-width: 768px) { .maunt-input { padding-right: 4rem; } }
+        .maunt-input:focus { outline: none; border-color: #ffffff; background: #2a2a2a; transform: translateY(-2px); }
         
-        .maunt-input:focus {
-            outline: none;
-            border-color: #1f279c; 
-            background: #9a9a9e;
-            box-shadow: 0 0 0 1px #DEB366, 0 10px 25px -5px rgba(0, 0, 0, 0.5);
-            transform: translateY(-2px);
-        }
-
-        .validation-icon {
-            opacity: 0;
-            transform: translateY(-50%) scale(0.5);
-            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-        .maunt-input.is-valid + .validation-icon {
-            opacity: 1;
-            transform: translateY(-50%) scale(1);
-        }
-
-        .maunt-checkbox {
-            appearance: none;
-            background-color: #1E1E1E;
-            margin: 0;
-            width: 2.5rem; 
-            height: 2.5rem; 
-            border: 2px solid #333;
-            display: grid;
-            place-content: center;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-        .maunt-checkbox::before {
-            content: "";
-            width: 1.5rem; 
-            height: 1.5rem; 
-            transform: scale(0);
-            transition: 200ms transform cubic-bezier(0.16, 1, 0.3, 1);
-            background-color: #121212;
-            clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
-        }
-        @media (min-width: 768px) {
-            .maunt-checkbox { width: 3.5rem; height: 3.5rem; } 
-            .maunt-checkbox::before { width: 2rem; height: 2rem; } 
-        }
-        
-        .maunt-checkbox:checked { background-color: #ffffff; border-color: #1e425D; } 
-        .maunt-checkbox:checked::before { transform: scale(1); }
+        /* Poprawka koloru dla listy krajów */
+        .iti__country-list { color: #000; }
+        .fade-view { transition: opacity 0.5s ease, transform 0.5s ease; }
+        .hidden-view { opacity: 0; transform: translateY(30px); pointer-events: none; display: none; }
     </style>
 </head>
-<body class="min-h-screen w-full flex flex-col items-center justify-center relative font-sans bg-mauntDark py-6 md:py-12">
+<body class="min-h-screen flex flex-col items-center justify-center p-4">
 
-    <div class="noise-overlay"></div>
     <div class="slanted-bg"></div>
 
-    <main id="form-view" class="w-full max-w-5xl mx-auto relative z-10 px-4 md:px-8 fade-view fade-in-active animate-entry">
-        <div class="bg-mauntDark p-6 sm:p-10 md:p-16 shadow-2xl border-t-4 border-mauntGold relative">
+    <main id="form-view" class="w-full max-w-4xl relative z-10 fade-view">
+        <div class="bg-[#2497d0] p-8 md:p-12 shadow-2xl border-t-8 border-white">
             
-            <div class="mb-6 md:mb-10 animate-entry flex flex-col md:flex-row items-center justify-center select-none gap-3 md:gap-6">
-                <div class="text-mauntGold font-black text-xl">Blue Dragon Jet</div>
-                <span class="text-mauntGold text-2xl md:text-3xl font-black"></span>
-                <img src="https://bluedragonjet.com/wp-content/uploads/2026/01/cropped-logo-male.png" alt="BDJ Logo" class="h-20 md:h-28 object-contain">
+            <div class="flex flex-col items-center justify-center mb-8 text-center">
+                <img src="https://bluedragonjet.com/wp-content/uploads/2026/03/bdj-logo-white.pdf" alt="BDJ" class="h-48 md:h-80 object-contain">
             </div>
 
-            <div class="mb-8 md:mb-14 animate-entry delay-100 text-center md:text-left">
-                <h1 class="text-3xl sm:text-4xl md:text-6xl text-mauntGold font-black uppercase leading-tight mb-2">
-                    ANGACOM <br class="hidden md:block"> 2026
-                </h1>
-                <p class="text-gray-400 text-xs sm:text-sm md:text-xl font-bold tracking-widest uppercase mt-2 md:mt-4">Hinterlassen Sie Ihre Daten / Leave your details</p>
-            </div>
+            <h2 class="text-white text-center text-xl md:text-2xl font-black uppercase tracking-widest mb-10">
+                Hinterlassen Sie Ihre Daten / Leave your details
+            </h2>
 
-            <form id="lead-form" class="space-y-6 md:space-y-8" novalidate>
-                <div class="animate-entry delay-200 relative">
-                    <label for="name" class="block text-white text-xs md:text-sm font-bold tracking-widest mb-2 md:mb-3 uppercase">Vorname und Nachname / Name</label>
-                    <div class="relative">
-                        <input type="text" id="name" name="name" required autocomplete="off" class="maunt-input w-full p-4 md:p-6 text-lg md:text-2xl font-bold rounded-none">
-                        <svg class="validation-icon absolute right-4 md:right-6 top-1/2 w-6 h-6 md:w-8 md:h-8 text-mauntGold pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+            <form id="lead-form" class="space-y-6">
+                <input type="hidden" name="access_key" value="f2fd5407-163e-4d73-ad00-380225767137">
+                
+                <div>
+                    <label class="block text-white text-xs font-bold uppercase mb-2">Name</label>
+                    <input type="text" name="name" required class="maunt-input w-full p-4 md:p-6 text-xl font-bold">
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-white text-xs font-bold uppercase mb-2">Firma / Company</label>
+                        <input type="text" name="company" required class="maunt-input w-full p-4 md:p-6 text-xl font-bold">
+                    </div>
+                    <div>
+                        <label class="block text-white text-xs font-bold uppercase mb-2">USt-IDNr. / VAT ID (NIP)</label>
+                        <input type="text" name="vatid" class="maunt-input w-full p-4 md:p-6 text-xl font-bold">
                     </div>
                 </div>
 
-                <div class="animate-entry delay-300 relative">
-                    <label for="company" class="block text-white text-xs md:text-sm font-bold tracking-widest mb-2 md:mb-3 uppercase">Firma / Company</label>
-                    <div class="relative">
-                        <input type="text" id="company" name="company" required autocomplete="off" class="maunt-input w-full p-4 md:p-6 text-lg md:text-2xl font-bold rounded-none">
-                        <svg class="validation-icon absolute right-4 md:right-6 top-1/2 w-6 h-6 md:w-8 md:h-8 text-mauntGold pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-white text-xs font-bold uppercase mb-2">Email</label>
+                        <input type="email" name="email" required class="maunt-input w-full p-4 md:p-6 text-xl font-bold">
+                    </div>
+                    <div>
+                        <label class="block text-white text-xs font-bold uppercase mb-2">Telefon / Phone</label>
+                        <input type="tel" id="phone" name="phone_full" required class="maunt-input w-full p-4 md:p-6 text-xl font-bold">
                     </div>
                 </div>
 
-                <div class="animate-entry delay-400 relative">
-                    <label for="email" class="block text-white text-xs md:text-sm font-bold tracking-widest mb-2 md:mb-3 uppercase">E-Mail Adresse / Email</label>
-                    <div class="relative">
-                        <input type="email" id="email" name="email" required autocomplete="off" class="maunt-input w-full p-4 md:p-6 text-lg md:text-2xl font-bold rounded-none">
-                        <svg class="validation-icon absolute right-4 md:right-6 top-1/2 w-6 h-6 md:w-8 md:h-8 text-mauntGold pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
-                    </div>
-                </div>
-
-                <div class="pt-4 md:pt-6 flex items-start md:items-center gap-4 md:gap-8 animate-entry delay-500">
-                    <input type="checkbox" id="gdpr" name="gdpr" required class="maunt-checkbox shrink-0 hover:scale-105 active:scale-95 mt-1 md:mt-0">
-                    <label for="gdpr" class="text-gray-300 text-sm md:text-lg md:leading-relaxed font-medium cursor-pointer select-none">
-                        Ich bin mit der Verarbeitung meiner Daten einverstanden. <br>
-                        <span class="text-gray-500 text-xs md:text-base mt-1 md:mt-2 block">I agree to the processing of data for commercial contact purposes.</span>
+                <div class="flex items-start gap-4 py-4">
+                    <input type="checkbox" name="gdpr" required class="w-8 h-8 shrink-0 cursor-pointer">
+                    <label class="text-white text-sm cursor-pointer select-none">
+                        Ich bin einverstanden / I agree to the processing of data.
                     </label>
                 </div>
 
-                <div class="pt-6 md:pt-10 animate-entry delay-600">
-                    <button type="submit" id="submit-btn" class="w-full bg-mauntGold text-mauntDark hover:bg-mauntGoldDark transition-all duration-300 p-5 md:p-8 text-xl md:text-3xl font-black uppercase tracking-[3px] flex justify-center items-center gap-4 hover:-translate-y-2 active:translate-y-0">
-                        <span>SENDEN / SUBMIT</span>
-                    </button>
-                </div>
+                <button type="submit" id="btn" class="w-full bg-white text-[#2497d0] p-6 md:p-8 text-2xl font-black uppercase hover:bg-gray-100 transition-all active:scale-95">
+                    SENDEN / SUBMIT
+                </button>
             </form>
         </div>
     </main>
 
-    <section id="success-view" class="fixed inset-0 flex flex-col items-center justify-center fade-view fade-out-down z-20 bg-mauntDark pointer-events-none px-4">
-        <div class="w-40 h-40 md:w-56 md:h-56 rounded-full border-4 md:border-8 border-mauntGold flex items-center justify-center mb-8 md:mb-12 shadow-glow animate-entry delay-100 bg-mauntDark z-30">
-            <svg class="w-20 h-20 md:w-28 md:h-28 text-mauntGold" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path class="checkmark-path" stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M5 13l4 4L19 7"></path>
-            </svg>
+    <section id="success-view" class="hidden-view fixed inset-0 flex flex-col items-center justify-center bg-[#2497d0] z-50 text-center px-4">
+        <div class="w-32 h-32 border-8 border-white rounded-full flex items-center justify-center mb-8">
+            <span class="text-white text-6xl">✓</span>
         </div>
-        <h2 class="text-4xl sm:text-5xl md:text-7xl font-black text-white mb-4 md:mb-6 uppercase tracking-tight animate-entry delay-300 z-30 relative text-center">Vielen Dank!</h2>
-        <h3 class="text-xl md:text-4xl font-bold text-mauntGold uppercase tracking-widest animate-entry delay-500 z-30 relative text-center">Thank you</h3>
+        <h2 class="text-white text-5xl font-black uppercase mb-4">Vielen Dank!</h2>
+        <h3 class="text-white text-2xl font-bold uppercase opacity-80">Thank you</h3>
     </section>
 
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const form = document.getElementById('lead-form');
-            const formView = document.getElementById('form-view');
-            const successView = document.getElementById('success-view');
-            const submitBtn = document.getElementById('submit-btn');
-            const textInputs = document.querySelectorAll('.maunt-input');
-            
-            const originalBtnContent = submitBtn.innerHTML;
-            
-            // TWÓJ LINK FORMSPREE
-            const ENDPOINT_URL = 'https://formspree.io/f/mojpazkq'; 
+        // Inicjalizacja wyboru kraju
+        const phoneInput = document.querySelector("#phone");
+        const iti = window.intlTelInput(phoneInput, {
+            initialCountry: "pl",
+            separateDialCode: true,
+            preferredCountries: ["pl", "de", "gb", "us"],
+            utilsScript: "https://cdn.jsdelivr.net/npm/intl-tel-input@23.0.10/build/js/utils.js",
+        });
 
-            // Walidacja wizualna (Checkmarki)
-            textInputs.forEach(input => {
-                input.addEventListener('input', () => {
-                    if (input.checkValidity() && input.value.trim().length > 0) {
-                        input.classList.add('is-valid');
-                    } else {
-                        input.classList.remove('is-valid');
-                    }
+        const form = document.getElementById('lead-form');
+        const btn = document.getElementById('btn');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            btn.disabled = true;
+            btn.innerText = "SENDING...";
+
+            const formData = new FormData(form);
+            const object = Object.fromEntries(formData);
+            
+            // Pobieramy pełny numer z kodem kraju
+            object.phone = iti.getNumber();
+
+            try {
+                const response = await fetch('https://api.web3forms.com/submit', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                    body: JSON.stringify(object)
                 });
-            });
 
-            // Obsługa wysyłki
-            form.addEventListener('submit', async (e) => {
-                e.preventDefault();
-
-                if (!form.checkValidity()) {
-                    alert('Bitte füllen Sie alle Felder aus. / Please fill in all fields.');
-                    return;
-                }
-
-                // Efekt ładowania na przycisku
-                submitBtn.disabled = true;
-                submitBtn.innerHTML = `
-                    <svg class="animate-spin -ml-1 mr-3 h-6 w-6 text-mauntDark" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    SENDEN...
-                `;
-                submitBtn.classList.add('opacity-80', 'cursor-wait');
-
-                const formData = new FormData(form);
-                
-                try {
-                    const response = await fetch(ENDPOINT_URL, {
-                        method: 'POST',
-                        body: formData,
-                        headers: { 'Accept': 'application/json' }
-                    });
-
-                    if (response.ok) {
-                        triggerSuccessFlow();
-                    } else {
-                        const data = await response.json();
-                        alert(data.errors ? data.errors[0].message : 'Błąd / Error');
-                        resetFormState();
-                    }
-                } catch (error) {
-                    alert('Fehler / Connection Error');
-                    resetFormState();
-                }
-            });
-
-            function triggerSuccessFlow() {
-                formView.classList.remove('fade-in-active');
-                formView.classList.add('fade-out-down');
-
-                setTimeout(() => {
-                    successView.classList.remove('fade-out-down', 'pointer-events-none');
-                    successView.classList.add('fade-in-active');
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                    setTimeout(() => successView.classList.add('animate-success'), 50);
+                if (response.ok) {
+                    document.getElementById('form-view').classList.add('hidden-view');
+                    document.getElementById('success-view').style.display = 'flex';
+                    setTimeout(() => {
+                        document.getElementById('success-view').classList.remove('hidden-view');
+                        document.getElementById('success-view').style.opacity = '1';
+                    }, 10);
                     
-                    // Powrót do pustego formularza po 5 sekundach (dla kolejnej osoby w kiosku)
-                    setTimeout(resetAppFlow, 5000);
-                }, 600);
-            }
-
-            function resetAppFlow() {
-                successView.classList.remove('fade-in-active', 'animate-success');
-                successView.classList.add('fade-out-down', 'pointer-events-none');
-
-                setTimeout(() => {
-                    form.reset();
-                    resetFormState();
-                    formView.classList.remove('animate-entry', 'fade-out-down');
-                    void formView.offsetWidth; 
-                    formView.classList.add('animate-entry', 'fade-in-active');
-                }, 600);
-            }
-
-            function resetFormState() {
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = originalBtnContent;
-                submitBtn.classList.remove('opacity-80', 'cursor-wait');
-                textInputs.forEach(input => input.classList.remove('is-valid'));
+                    setTimeout(() => location.reload(), 5000);
+                } else {
+                    alert("Error! Please try again.");
+                    btn.disabled = false;
+                    btn.innerText = "SENDEN / SUBMIT";
+                }
+            } catch (err) {
+                alert("Connection error.");
+                btn.disabled = false;
+                btn.innerText = "SENDEN / SUBMIT";
             }
         });
     </script>
