@@ -4,137 +4,170 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>BDJ Kiosk</title>
+    
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&display=swap" rel="stylesheet">
+    
     <script src="https://cdn.tailwindcss.com"></script>
     
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/intl-tel-input@23.0.10/build/css/intlTelInput.css">
     <script src="https://cdn.jsdelivr.net/npm/intl-tel-input@23.0.10/build/js/intlTelInput.min.js"></script>
 
     <style>
-        body { background-color: #2497d0; font-family: 'Montserrat', sans-serif; overflow-x: hidden; }
-        .slanted-bg {
-            position: fixed; bottom: 0; left: 0; width: 100%; height: 40vh;
-            background-color: #ffffff; clip-path: polygon(0 15%, 100% 0, 100% 100%, 0% 100%); z-index: 1;
+        body { 
+            background-color: #2497d0; 
+            font-family: 'Montserrat', sans-serif; 
+            overflow-x: hidden; 
+            -webkit-tap-highlight-color: transparent;
         }
+        
+        .slanted-bg {
+            position: fixed; bottom: 0; left: 0; width: 100%; height: 35vh;
+            background-color: #ffffff; clip-path: polygon(0 20%, 100% 0, 100% 100%, 0% 100%); z-index: -1;
+        }
+
         .iti { width: 100%; display: block; }
         .maunt-input {
-            background: #1E1E1E; border: 2px solid #333; color: white; transition: all 0.3s;
-            width: 100%;
-        }
-        .maunt-input:focus { outline: none; border-color: #ffffff; background: #2a2a2a; transform: translateY(-2px); }
-        
-        select.maunt-input {
+            background: #1E1E1E; border: 2px solid #333; color: white; 
+            transition: all 0.3s ease; width: 100%; border-radius: 8px;
             appearance: none;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='white' viewBox='0 0 24 24'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right 1rem center;
-            background-size: 1.5em;
+        }
+        .maunt-input:focus { 
+            outline: none; border-color: #2497d0; background: #2a2a2a; 
+            box-shadow: 0 0 0 4px rgba(36, 151, 208, 0.3); transform: translateY(-2px);
+        }
+
+        /* NATYWNY ACCORDION (100% niezawodny) */
+        details > summary {
+            list-style: none; /* Ukrywa domyślny trójkąt */
+            cursor: pointer;
+        }
+        details > summary::-webkit-details-marker {
+            display: none; /* Ukrywa trójkąt na Safari */
+        }
+        
+        /* Strzałka w accordionie */
+        .arrow-icon { transition: transform 0.3s ease; display: inline-block; }
+        details[open] .arrow-icon { transform: rotate(180deg); }
+
+        /* Siatka Kafelków */
+        .machine-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 12px;
+            padding-top: 15px;
+        }
+
+        .machine-tile {
+            background: #1E1E1E; border: 2px solid #333; color: white; border-radius: 8px;
+            padding: 12px 8px; cursor: pointer; transition: all 0.2s ease;
+            display: flex; align-items: center; justify-content: center; text-align: center;
+            font-weight: 700; font-size: 0.85rem; min-height: 70px; user-select: none;
+        }
+        
+        input[type="checkbox"]:checked + .machine-tile {
+            background: #ffffff; color: #2497d0; border-color: #ffffff; 
+            transform: translateY(-3px); box-shadow: 0 4px 12px rgba(0,0,0,0.4);
         }
 
         .fade-view { transition: opacity 0.5s ease, transform 0.5s ease; }
         .hidden-view { opacity: 0; transform: translateY(30px); pointer-events: none; display: none; }
-        
-        select option { background-color: #1E1E1E; color: white; }
     </style>
 </head>
-<body class="min-h-screen flex flex-col items-center justify-center p-4">
+<body class="min-h-screen flex flex-col items-center justify-center p-4 md:p-8">
 
     <div class="slanted-bg"></div>
 
     <main id="form-view" class="w-full max-w-4xl relative z-10 fade-view">
-        <div class="bg-[#2497d0] p-8 md:p-12 shadow-2xl border-t-8 border-white">
+        <div class="bg-[#2497d0] p-6 md:p-12 shadow-2xl rounded-2xl md:rounded-3xl border-t-8 border-white mb-10">
             
             <div class="flex flex-col items-center justify-center mb-8 text-center">
-                <img src="https://bluedragonjet.com/wp-content/uploads/2026/03/bdj-logo-white.pdf" alt="BDJ" class="h-40 md:h-64 object-contain">
+                <img src="https://bluedragonjet.com/wp-content/uploads/2026/03/bdj-logo-white.pdf" alt="BDJ" class="h-32 md:h-64 object-contain">
             </div>
 
-            <h2 class="text-white text-center text-xl md:text-2xl font-black uppercase tracking-widest mb-10">
+            <h2 class="text-white text-center text-lg md:text-2xl font-black uppercase tracking-widest mb-8">
                 Hinterlassen Sie Ihre Daten / Leave your details
             </h2>
 
             <form id="lead-form" class="space-y-6">
                 <input type="hidden" name="access_key" value="f2fd5407-163e-4d73-ad00-380225767137">
                 
-                <div>
-                    <label class="block text-white text-xs font-bold uppercase mb-2">Vorname und Nachname / Full Name</label>
-                    <input type="text" name="name" required class="maunt-input p-4 md:p-6 text-xl font-bold">
-                </div>
-
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                        <label class="block text-white text-xs font-bold uppercase mb-2">Firma / Company</label>
-                        <input type="text" name="company" required class="maunt-input p-4 md:p-6 text-xl font-bold">
+                        <label class="block text-white text-xs font-bold uppercase mb-2">Vorname und Nachname / Full Name</label>
+                        <input type="text" name="name" required class="maunt-input p-4 text-lg font-bold">
                     </div>
                     <div>
-                        <label class="block text-white text-xs font-bold uppercase mb-2">USt-IDNr. / VAT ID</label>
-                        <input type="text" name="vatid" class="maunt-input p-4 md:p-6 text-xl font-bold">
+                        <label class="block text-white text-xs font-bold uppercase mb-2">Firma / Company</label>
+                        <input type="text" name="company" required class="maunt-input p-4 text-lg font-bold">
                     </div>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                         <label class="block text-white text-xs font-bold uppercase mb-2">E-Mail Adresse / Email</label>
-                        <input type="email" name="email" required class="maunt-input p-4 md:p-6 text-xl font-bold">
+                        <input type="email" name="email" required class="maunt-input p-4 text-lg font-bold">
                     </div>
                     <div>
-                        <label class="block text-white text-xs font-bold uppercase mb-2">Telefonnummer / Phone Number</label>
-                        <input type="tel" id="phone" name="phone_full" required class="maunt-input p-4 md:p-6 text-xl font-bold">
+                        <label class="block text-white text-xs font-bold uppercase mb-2">Telefonnummer / Phone</label>
+                        <input type="tel" id="phone" name="phone_full" required class="maunt-input p-4 text-lg font-bold">
                     </div>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                         <label class="block text-white text-xs font-bold uppercase mb-2">Land / Country</label>
-                        <input list="countries" name="country" required class="maunt-input p-4 md:p-6 text-xl font-bold" placeholder="Start typing...">
+                        <input list="countries" name="country" required class="maunt-input p-4 text-lg font-bold" placeholder="Tap to select...">
                         <datalist id="countries">
-                            <option value="Germany">
-                            <option value="Poland">
-                            <option value="United Kingdom">
-                            <option value="USA">
-                            <option value="France">
-                            <option value="Italy">
-                            <option value="Spain">
-                            <option value="Netherlands">
-                            <option value="Switzerland">
-                            <option value="Austria">
-                            <option value="Czech Republic">
-                            <option value="Slovakia">
+                            <option value="Germany"><option value="Poland"><option value="USA"><option value="United Kingdom">
+                            <option value="France"><option value="Italy"><option value="Spain"><option value="Netherlands">
+                            <option value="Switzerland"><option value="Austria"><option value="Czech Republic"><option value="Slovakia">
                         </datalist>
                     </div>
-                    
                     <div>
-                        <label class="block text-white text-xs font-bold uppercase mb-2">Maschine / Machine</label>
-                        <select name="machine_inquiry" required class="maunt-input p-4 md:p-6 text-xl font-bold">
-                            <option value="" disabled selected>Select Machine</option>
-                            <option value="BDJ NEXT">BDJ NEXT</option>
-                            <option value="BDJ Budget Plus Easy Set">BDJ Budget Plus Easy Set</option>
-                            <option value="BDJ Budget Easy Set">BDJ Budget Easy Set</option>
-                            <option value="BDJ Budget PLUS">BDJ Budget PLUS</option>
-                            <option value="BDJ Budget">BDJ Budget</option>
-                            <option value="BDJ Mini">BDJ Mini</option>
-                            <option value="BDJ Mini Counter">BDJ Mini Counter</option>
-                            <option value="BDJ Hydro">BDJ Hydro</option>
-                            <option value="BDJ Hydro Chain Cable">BDJ Hydro Chain Cable</option>
-                            <option value="BDJ Hydro Chain Multi Tube">BDJ Hydro Chain Multi Tube</option>
-                            <option value="BDJ Max Dual Head">BDJ Max Dual Head</option>
-                            <option value="BDJ Max">BDJ Max</option>
-                            <option value="BDJ Extended">BDJ Extended</option>
-                            <option value="DragonAir">DragonAir</option>
-                            <option value="Electronic Counter">Electronic Counter</option>
-                            <option value="M-Head">M-Head</option>
-                            <option value="POW-Head">POW-Head</option>
-                        </select>
+                        <label class="block text-white text-xs font-bold uppercase mb-2">USt-IDNr. / VAT ID (Optional)</label>
+                        <input type="text" name="vatid" class="maunt-input p-4 text-lg font-bold">
                     </div>
                 </div>
 
-                <div class="flex items-start gap-4 py-4">
-                    <input type="checkbox" id="gdpr" name="gdpr" required class="w-8 h-8 shrink-0 cursor-pointer">
-                    <label for="gdpr" class="text-white text-sm cursor-pointer select-none">
+                <div class="pt-2">
+                    <details id="machine-details" class="w-full bg-[#1E1E1E] border-2 border-[#333] rounded-lg">
+                        <summary class="p-4 text-lg font-bold text-white flex justify-between items-center focus:outline-none">
+                            <span id="summary-title">Select Machines / Maschine wählen</span>
+                            <span class="arrow-icon text-xl text-[#2497d0]">▼</span>
+                        </summary>
+                        
+                        <div class="p-4 border-t border-[#333]">
+                            <div class="machine-grid">
+                                <label><input type="checkbox" name="machines[]" value="BDJ NEXT" class="hidden machine-checkbox"><div class="machine-tile">BDJ NEXT</div></label>
+                                <label><input type="checkbox" name="machines[]" value="BDJ Budget Plus Easy Set" class="hidden machine-checkbox"><div class="machine-tile">BDJ Budget Plus Easy Set</div></label>
+                                <label><input type="checkbox" name="machines[]" value="BDJ Budget Easy Set" class="hidden machine-checkbox"><div class="machine-tile">BDJ Budget Easy Set</div></label>
+                                <label><input type="checkbox" name="machines[]" value="BDJ Budget PLUS" class="hidden machine-checkbox"><div class="machine-tile">BDJ Budget PLUS</div></label>
+                                <label><input type="checkbox" name="machines[]" value="BDJ Budget" class="hidden machine-checkbox"><div class="machine-tile">BDJ Budget</div></label>
+                                <label><input type="checkbox" name="machines[]" value="BDJ Mini" class="hidden machine-checkbox"><div class="machine-tile">BDJ Mini</div></label>
+                                <label><input type="checkbox" name="machines[]" value="BDJ Mini Counter" class="hidden machine-checkbox"><div class="machine-tile">BDJ Mini Counter</div></label>
+                                <label><input type="checkbox" name="machines[]" value="BDJ Hydro" class="hidden machine-checkbox"><div class="machine-tile">BDJ Hydro</div></label>
+                                <label><input type="checkbox" name="machines[]" value="BDJ Hydro Chain Cable" class="hidden machine-checkbox"><div class="machine-tile">BDJ Hydro Chain Cable</div></label>
+                                <label><input type="checkbox" name="machines[]" value="BDJ Hydro Chain Multi Tube" class="hidden machine-checkbox"><div class="machine-tile">BDJ Hydro Chain Multi Tube</div></label>
+                                <label><input type="checkbox" name="machines[]" value="BDJ Max Dual Head" class="hidden machine-checkbox"><div class="machine-tile">BDJ Max Dual Head</div></label>
+                                <label><input type="checkbox" name="machines[]" value="BDJ Max" class="hidden machine-checkbox"><div class="machine-tile">BDJ Max</div></label>
+                                <label><input type="checkbox" name="machines[]" value="BDJ Extended" class="hidden machine-checkbox"><div class="machine-tile">BDJ Extended</div></label>
+                                <label><input type="checkbox" name="machines[]" value="DragonAir" class="hidden machine-checkbox"><div class="machine-tile">DragonAir</div></label>
+                                <label><input type="checkbox" name="machines[]" value="Electronic Counter" class="hidden machine-checkbox"><div class="machine-tile">Electronic Counter</div></label>
+                                <label><input type="checkbox" name="machines[]" value="M-Head" class="hidden machine-checkbox"><div class="machine-tile">M-Head</div></label>
+                                <label><input type="checkbox" name="machines[]" value="POW-Head" class="hidden machine-checkbox"><div class="machine-tile">POW-Head</div></label>
+                            </div>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="flex items-center gap-4 py-4">
+                    <input type="checkbox" id="gdpr" name="gdpr" required class="w-7 h-7 md:w-8 md:h-8 shrink-0 cursor-pointer accent-[#2497d0]">
+                    <label for="gdpr" class="text-white text-xs md:text-sm cursor-pointer select-none">
                         Ich bin einverstanden / I agree to the processing of data.
                     </label>
                 </div>
 
-                <button type="submit" id="btn" class="w-full bg-white text-[#2497d0] p-6 md:p-8 text-2xl font-black uppercase hover:bg-gray-100 transition-all active:scale-95">
+                <button type="submit" id="btn" class="w-full bg-white text-[#2497d0] p-5 md:p-6 text-xl md:text-2xl font-black uppercase rounded-lg hover:bg-gray-100 hover:shadow-xl active:scale-95 transition-all">
                     SENDEN / SUBMIT
                 </button>
             </form>
@@ -142,38 +175,66 @@
     </main>
 
     <section id="success-view" class="hidden-view fixed inset-0 flex flex-col items-center justify-center bg-[#2497d0] z-50 text-center px-4">
-        <div class="w-32 h-32 border-8 border-white rounded-full flex items-center justify-center mb-8">
-            <span class="text-white text-6xl">✓</span>
+        <div class="w-24 h-24 md:w-32 md:h-32 border-8 border-white rounded-full flex items-center justify-center mb-6 md:mb-8 shadow-2xl">
+            <span class="text-white text-5xl md:text-6xl">✓</span>
         </div>
-        <h2 class="text-white text-5xl font-black uppercase mb-4">Vielen Dank!</h2>
-        <h3 class="text-white text-2xl font-bold uppercase opacity-80">Thank you</h3>
+        <h2 class="text-white text-4xl md:text-5xl font-black uppercase mb-4">Vielen Dank!</h2>
+        <h3 class="text-white text-xl md:text-2xl font-bold uppercase opacity-80">Thank you</h3>
     </section>
 
     <script>
         const phoneInput = document.querySelector("#phone");
-        const itiPhone = window.intlTelInput(phoneInput, {
+        const iti = window.intlTelInput(phoneInput, {
             initialCountry: "de",
             separateDialCode: true,
-            preferredCountries: ["de", "pl", "gb", "us"],
             utilsScript: "https://cdn.jsdelivr.net/npm/intl-tel-input@23.0.10/build/js/utils.js",
+        });
+
+        // Aktualizacja napisu "Select Machines" po zaznaczeniu
+        const checkboxes = document.querySelectorAll('.machine-checkbox');
+        const summaryTitle = document.getElementById('summary-title');
+        
+        checkboxes.forEach(box => {
+            box.addEventListener('change', () => {
+                const checkedCount = document.querySelectorAll('.machine-checkbox:checked').length;
+                if(checkedCount > 0) {
+                    summaryTitle.innerText = `Selected Machines (${checkedCount})`;
+                    summaryTitle.style.color = '#2497d0';
+                } else {
+                    summaryTitle.innerText = 'Select Machines / Maschine wählen';
+                    summaryTitle.style.color = 'white';
+                }
+            });
         });
 
         const form = document.getElementById('lead-form');
         const btn = document.getElementById('btn');
+        const detailsBox = document.getElementById('machine-details');
 
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
-            btn.disabled = true;
-            btn.innerText = "SENDING...";
-
+            
             const formData = new FormData(form);
             const object = Object.fromEntries(formData);
-            object.full_phone_number = itiPhone.getNumber();
+            
+            // Walidacja
+            const selectedMachines = formData.getAll('machines[]');
+            if (selectedMachines.length === 0) {
+                alert("Please select at least one machine / Bitte wählen Sie eine Maschine.");
+                detailsBox.open = true; // Automatycznie otwiera panel, jeśli nic nie wybrano
+                return;
+            }
+            
+            object.selected_machines = selectedMachines.join(', ');
+            object.phone_full = iti.getNumber();
+
+            btn.disabled = true;
+            btn.innerText = "SENDING...";
 
             try {
                 const response = await fetch('https://api.web3forms.com/submit', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(object)
                 });
 
@@ -186,13 +247,14 @@
                     }, 10);
                     setTimeout(() => location.reload(), 5000);
                 } else {
-                    alert("Error! Please verify your key.");
+                    alert("Submission failed. Check your email verification.");
                     btn.disabled = false;
                     btn.innerText = "SENDEN / SUBMIT";
                 }
             } catch (err) {
-                alert("Connection error.");
+                alert("Connection error. Please check your internet connection.");
                 btn.disabled = false;
+                btn.innerText = "SENDEN / SUBMIT";
             }
         });
     </script>
